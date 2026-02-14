@@ -30,7 +30,7 @@ export const MenuTable = ({ onEdit }) => {
   if (loading) return <div className="p-8 text-center font-serif italic text-gray-400">Loading live menu...</div>;
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
+    <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm w-full">
       {/* Header */}
       <div className="p-5 md:p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
         <h3 className="font-serif italic text-xl text-deli-green">Live Inventory</h3>
@@ -40,10 +40,13 @@ export const MenuTable = ({ onEdit }) => {
       </div>
 
       {/* 1. MOBILE VIEW: CARD LIST (Visible on < 768px) */}
-      <div className="block md:hidden divide-y divide-slate-50">
+      {/* FIX: Added overflow-hidden to the container to prevent any child from pushing width */}
+      <div className="block md:hidden divide-y divide-slate-50 overflow-hidden">
         {items.map((item) => (
-          <div key={item.id} className="p-4 flex items-center justify-between gap-4 active:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-3 min-w-0">
+          /* FIX: Added min-w-0 and changed gap for tighter mobile screens */
+          <div key={item.id} className="p-4 flex items-center justify-between gap-3 active:bg-slate-50 transition-colors w-full min-w-0">
+            {/* FIX: flex-1 and min-w-0 here allows the text container to shrink rather than push the screen */}
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <div className="w-12 h-12 rounded-xl bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-100">
                 {item.image_url ? (
                   <img src={item.image_url} alt="" className="w-full h-full object-cover" />
@@ -51,20 +54,21 @@ export const MenuTable = ({ onEdit }) => {
                   <div className="w-full h-full flex items-center justify-center"><ImageIcon size={16} className="text-slate-300" /></div>
                 )}
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="font-bold text-slate-800 text-sm truncate flex items-center gap-1">
                   {item.name}
                   {item.is_deal && <Star size={10} className="text-deli-gold fill-deli-gold" />}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[9px] font-black uppercase text-deli-green">{item.price}</span>
-                  <span className="text-[8px] text-slate-400">•</span>
-                  <span className="text-[9px] uppercase font-bold text-slate-400">{item.section}</span>
+                  <span className="text-[9px] font-black uppercase text-deli-green whitespace-nowrap">{item.price}</span>
+                  <span className="text-[8px] text-slate-400 shrink-0">•</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400 truncate">{item.section}</span>
                 </div>
               </div>
             </div>
             
-            <div className="flex gap-1">
+            {/* FIX: Added shrink-0 to buttons so they never get squished or pushed off screen */}
+            <div className="flex gap-1 shrink-0">
               <button onClick={() => onEdit(item)} className="p-3 text-slate-400 active:text-deli-green active:bg-deli-green/10 rounded-xl transition-all">
                 <Edit3 size={18} />
               </button>
@@ -96,11 +100,11 @@ export const MenuTable = ({ onEdit }) => {
                       {item.image_url ? (
                         <img src={item.image_url} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <ImageIcon size={14} className="text-slate-300" />
+                        <div className="w-full h-full flex items-center justify-center"><ImageIcon size={14} className="text-slate-300" /></div>
                       )}
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-bold text-slate-700 flex items-center gap-2">
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-bold text-slate-700 flex items-center gap-2 truncate">
                         {item.name}
                         {item.is_deal && (
                           <span className="bg-deli-gold/10 text-deli-gold p-1 rounded-md" title="Daily Deal">
@@ -121,7 +125,7 @@ export const MenuTable = ({ onEdit }) => {
                     {item.section}
                   </span>
                 </td>
-                <td className="px-6 py-4 font-serif text-deli-green font-bold">
+                <td className="px-6 py-4 font-serif text-deli-green font-bold whitespace-nowrap">
                   {item.price}
                 </td>
                 <td className="px-6 py-4 text-right">

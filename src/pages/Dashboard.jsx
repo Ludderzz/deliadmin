@@ -170,20 +170,12 @@ export const Dashboard = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* THE MENU TABLE */}
-          <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-             <div className="p-6 lg:p-8 border-b border-slate-50 flex items-center justify-between">
-                <h3 className="font-serif italic text-xl lg:text-2xl text-deli-green">Active Menu</h3>
-                <span className="px-2 py-1 bg-green-50 text-[9px] font-bold text-green-600 rounded uppercase tracking-widest">Live</span>
-             </div>
-             <div className="overflow-x-auto w-full">
-               <div className="p-4 lg:p-8">
-                 <MenuTable 
-                   key={stats.cafe + stats.deli + stats.catering} 
-                   onEdit={handleEdit} 
-                 />
-               </div>
-             </div>
+          {/* THE MENU TABLE - Fixed container to prevent mobile poo */}
+          <div className="lg:col-span-2 min-w-0 w-full">
+              <MenuTable 
+                key={stats.cafe + stats.deli + stats.catering} 
+                onEdit={handleEdit} 
+              />
           </div>
 
         </div>
