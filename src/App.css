@@ -1,23 +1,52 @@
-/* CLEANED APP.CSS 
-  Removed #root constraints to fix mobile side-scrolling 
-*/
-
-#root {
-  /* Removed max-width, margin, and padding to allow full-screen dashboard */
-  width: 100%;
-  height: 100%;
+/* 1. THE RESET - Kill all browser-default "wobble" */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  /* Prevent any element from ever being wider than the phone screen */
+  max-width: 100vw; 
 }
 
-/* Reset html/body to ensure no hidden overflow issues */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  overflow-x: hidden;
+  max-width: 100%;
+  height: 100%;
+  /* The "Poo Killer" combo */
+  overflow-x: hidden !important; 
   position: relative;
+  /* Forces the browser to ignore horizontal swipes */
+  touch-action: pan-y; 
+  /* Prevents font-size jumping on orientation change */
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Keep logo styles for potential use in the public-facing site */
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* 2. DASHBOARD SPECIFIC FIXES */
+main {
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+/* Force tables and long strings to wrap or hide instead of pushing the wall out */
+table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+input, textarea, p, span {
+  word-break: break-word;
+}
+
+/* 3. ORIGINAL STYLES (Cleaned) */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -34,12 +63,8 @@ html, body {
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -54,9 +79,4 @@ html, body {
 
 .read-the-docs {
   color: #888;
-}
-html, body {
-  max-width: 100%;
-  overflow-x: hidden;
-  position: relative; /* Safety net for absolute elements */
 }
