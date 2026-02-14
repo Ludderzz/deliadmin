@@ -85,7 +85,7 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
         ...formData,
         image_url: publicImageUrl,
         tags: formData.tags.join(', '),
-        is_deal: isCatering ? false : isDeal, // Force false for catering
+        is_deal: isCatering ? false : isDeal, 
       };
 
       if (initialData?.id) {
@@ -108,22 +108,27 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end">
-      <div className="absolute inset-0 bg-deli-green/40 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-[200] flex justify-end">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-deli-green/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
       
-      <div className="relative w-full max-w-lg bg-white h-full shadow-2xl p-8 overflow-y-auto animate-in slide-in-from-right duration-300">
+      {/* Drawer Container */}
+      <div className="relative w-full md:max-w-lg bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
         
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-3xl font-serif text-deli-green italic">
-            {initialData ? 'Edit Product' : (isCatering ? 'Add Catering Package' : 'Add New Item')}
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b border-slate-100">
+          <h2 className="text-2xl md:text-3xl font-serif text-deli-green italic">
+            {initialData ? 'Edit Product' : (isCatering ? 'Add Catering' : 'Add New Item')}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full"><X /></button>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X size={24} /></button>
         </div>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Scrollable Form Area */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 pb-32">
+          
           {/* IMAGE UPLOAD */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-3">
               {isCatering ? 'Package Gallery Image' : 'Product Image'}
             </label>
             <div 
@@ -133,35 +138,51 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
               {imagePreview ? (
                 <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
               ) : (
-                <>
-                  <UploadCloud className="text-slate-300 mb-2" size={32} />
-                  <span className="text-xs text-slate-400 italic">Click to upload photo</span>
-                </>
+                <div className="text-center p-4">
+                  <UploadCloud className="text-slate-300 mx-auto mb-2" size={32} />
+                  <span className="text-xs text-slate-400 italic block">Tap to upload photo</span>
+                </div>
               )}
               <input id="imageInput" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">
                 {isCatering ? 'Package Name' : 'Item Name'}
               </label>
-              <input required type="text" className="admin-input" placeholder={isCatering ? "e.g. Luxury Sandwich Platter" : "e.g. Somerset Brie Sourdough"} 
-                value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+              <input 
+                required 
+                type="text" 
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base md:text-sm focus:border-deli-gold outline-none transition-all" 
+                placeholder={isCatering ? "e.g. Luxury Sandwich Platter" : "e.g. Somerset Brie Sourdough"} 
+                value={formData.name} 
+                onChange={e => setFormData({...formData, name: e.target.value})} 
+              />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">
                   {isCatering ? 'Price (Per Head)' : 'Regular Price'}
                 </label>
-                <input required type="text" className="admin-input" placeholder="£12.50" 
-                  value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+                <input 
+                  required 
+                  type="text" 
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none" 
+                  placeholder="£12.50" 
+                  value={formData.price} 
+                  onChange={e => setFormData({...formData, price: e.target.value})} 
+                />
               </div>
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Section</label>
-                <select className="admin-input" value={formData.section} onChange={e => setFormData({...formData, section: e.target.value})}>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">Section</label>
+                <select 
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none appearance-none" 
+                  value={formData.section} 
+                  onChange={e => setFormData({...formData, section: e.target.value})}
+                >
                   <option value="cafe">Cafe</option>
                   <option value="deli">Deli Retail</option>
                   <option value="catering">Catering</option>
@@ -170,70 +191,103 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
             </div>
           </div>
 
-          {/* HIDE DEALS IF CATERING */}
+          {/* DEALS TOGGLE */}
           {!isCatering ? (
-            <div className={`p-4 rounded-2xl border transition-all ${isDeal ? 'border-deli-gold bg-deli-gold/5' : 'border-gray-100 bg-gray-50'}`}>
+            <div className={`p-5 rounded-2xl border transition-all ${isDeal ? 'border-deli-gold bg-deli-gold/5' : 'border-slate-100 bg-slate-50'}`}>
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Percent size={16} className={isDeal ? 'text-deli-gold' : 'text-gray-400'} />
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${isDeal ? 'bg-deli-gold text-white' : 'bg-slate-200 text-slate-400'}`}>
+                    <Percent size={16} />
+                  </div>
                   <span className="text-sm font-bold text-deli-green uppercase tracking-wider">Set as Daily Deal?</span>
                 </div>
-                <input type="checkbox" checked={isDeal} onChange={e => setIsDeal(e.target.checked)} className="w-5 h-5 accent-deli-gold" />
+                <input 
+                  type="checkbox" 
+                  checked={isDeal} 
+                  onChange={e => setIsDeal(e.target.checked)} 
+                  className="w-6 h-6 rounded-lg accent-deli-gold cursor-pointer" 
+                />
               </div>
               {isDeal && (
-                <input type="text" className="admin-input border-deli-gold/30" placeholder="Deal Price (e.g. £5.00)" 
-                  value={formData.deal_price} onChange={e => setFormData({...formData, deal_price: e.target.value})} />
+                <input 
+                  type="text" 
+                  className="w-full bg-white border-2 border-deli-gold/30 rounded-xl p-4 text-base focus:border-deli-gold outline-none animate-in fade-in slide-in-from-top-2" 
+                  placeholder="Deal Price (e.g. £5.00)" 
+                  value={formData.deal_price} 
+                  onChange={e => setFormData({...formData, deal_price: e.target.value})} 
+                />
               )}
             </div>
           ) : (
-            <div className="p-4 rounded-2xl border border-deli-green/20 bg-deli-green/5 flex items-center gap-4">
-               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-deli-green shadow-sm">
+            <div className="p-5 rounded-2xl border border-deli-green/20 bg-deli-green/5 flex items-center gap-4">
+               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-deli-green shadow-sm shrink-0">
                   <Users size={20} />
                </div>
                <div>
-                  <p className="text-xs font-bold text-deli-green uppercase tracking-tight">Catering Mode Active</p>
-                  <p className="text-[10px] text-gray-500 italic">Include min. order counts in the description.</p>
+                  <p className="text-xs font-bold text-deli-green uppercase tracking-tight leading-none mb-1">Catering Mode</p>
+                  <p className="text-[10px] text-slate-500 italic">Mention minimum order counts in description.</p>
                </div>
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">
                 {isCatering ? 'Package Overview' : 'Description'}
               </label>
-              <textarea className="admin-input h-24" placeholder={isCatering ? "What's included in this platter?" : "Describe the flavors..."} 
-                value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+              <textarea 
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none h-24" 
+                placeholder={isCatering ? "What's included in this platter?" : "Describe the flavours..."} 
+                value={formData.description} 
+                onChange={e => setFormData({...formData, description: e.target.value})} 
+              />
             </div>
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                {isCatering ? 'Full Menu / Item List' : 'Ingredients'}
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">
+                {isCatering ? 'Item List' : 'Ingredients'}
               </label>
-              <textarea className="admin-input h-20" placeholder={isCatering ? "List the specific items included..." : "Flour, water, salt..."} 
-                value={formData.ingredients} onChange={e => setFormData({...formData, ingredients: e.target.value})} />
+              <textarea 
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none h-20" 
+                placeholder={isCatering ? "List specific items..." : "Flour, water, salt..."} 
+                value={formData.ingredients} 
+                onChange={e => setFormData({...formData, ingredients: e.target.value})} 
+              />
             </div>
           </div>
 
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-3">Dietary Tags</label>
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-3">Dietary Tags</label>
             <div className="flex flex-wrap gap-2">
               {dietaryOptions.map(tag => (
-                <button key={tag} type="button" onClick={() => handleTagToggle(tag)}
-                  className={`px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${
-                    formData.tags.includes(tag) ? 'bg-deli-green text-white border-deli-green' : 'bg-white text-gray-400 border-gray-200'
-                  }`}>
+                <button 
+                  key={tag} 
+                  type="button" 
+                  onClick={() => handleTagToggle(tag)}
+                  className={`px-5 py-2 rounded-full text-[10px] font-black border transition-all active:scale-90 ${
+                    formData.tags.includes(tag) 
+                    ? 'bg-deli-green text-white border-deli-green shadow-md shadow-deli-green/20' 
+                    : 'bg-white text-slate-400 border-slate-200'
+                  }`}
+                >
                   {tag}
                 </button>
               ))}
             </div>
           </div>
+        </form>
 
-          <button disabled={loading} type="submit" className="btn-primary w-full py-4 flex items-center justify-center gap-2">
-            {loading ? 'Saving Changes...' : (
+        {/* Fixed Footer Button */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-slate-100 backdrop-blur-md">
+          <button 
+            disabled={loading} 
+            onClick={handleSubmit}
+            className="w-full bg-deli-green text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:shadow-xl active:scale-95 transition-all disabled:opacity-50"
+          >
+            {loading ? 'Saving...' : (
               <>{initialData ? <Save size={18}/> : <Plus size={18}/>} {initialData ? 'Update Live Menu' : 'Add to Live Menu'}</>
             )}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );

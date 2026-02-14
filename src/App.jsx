@@ -3,7 +3,6 @@ import { Dashboard } from './pages/Dashboard';
 import { LoginPage } from './pages/LoginPage';
 
 function App() {
-  // 1. Check if the user was already logged in (saved in browser memory)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -15,32 +14,37 @@ function App() {
     setLoading(false);
   }, []);
 
-  // 2. Function to call when login is successful
   const handleLoginSuccess = () => {
     localStorage.setItem('isDeliAdmin', 'true');
     setIsLoggedIn(true);
   };
 
-  // 3. Optional: Function to logout
   const handleLogout = () => {
     localStorage.removeItem('isDeliAdmin');
     setIsLoggedIn(false);
   };
 
-  if (loading) return null; // Prevent flicker while checking login
+  if (loading) return null;
 
   return (
-    <div className="antialiased text-slate-900 selection:bg-admin-accent selection:text-white">
+    // 1. Fixed "min-h-screen" ensures the background color always fills the mobile viewport
+    // 2. "overflow-x-hidden" prevents accidental side-scrolling on touch devices
+    <div className="min-h-screen antialiased text-slate-900 selection:bg-admin-accent selection:text-white overflow-x-hidden bg-admin-bg">
+      
       {isLoggedIn ? (
-        /* Only show Dashboard if logged in */
         <Dashboard onLogout={handleLogout} />
       ) : (
-        /* Show Login Page if NOT logged in */
         <LoginPage onLoginSuccess={handleLoginSuccess} />
       )}
       
-      {/* Toast Notification Container */}
-      <div id="notifications" className="fixed bottom-4 right-4 z-50" />
+      {/* MOBILE NOTIFICATION FIX: 
+         - On small screens (sm:), it stays bottom-center and spans the width.
+         - On desktop (md:), it moves back to the bottom-right.
+      */}
+      <div 
+        id="notifications" 
+        className="fixed bottom-0 sm:bottom-4 left-0 sm:left-auto right-0 sm:right-4 z-[999] p-4 sm:p-0 pointer-events-none" 
+      />
     </div>
   );
 }

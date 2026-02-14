@@ -18,15 +18,13 @@ export const CSVUploader = ({ onComplete }) => {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
-        // Transform CSV data to match Supabase column names
         const formattedData = results.data.map(row => ({
           name: row.Name || row.name,
           description: row.Description || row.description,
           price: row.Price || row.price,
           section: (row.Section || row.section || 'cafe').toLowerCase(),
           category: row.Category || row.category,
-          // Convert comma-separated string "VG, GF" into array ["VG", "GF"]
-          dietary_tags: row.Tags ? row.Tags.split(',').map(t => t.trim().toUpperCase()) : [],
+          tags: row.Tags ? row.Tags.split(',').map(t => t.trim().toUpperCase()) : [],
           is_featured: (row.Featured || row.featured || '').toLowerCase() === 'yes'
         }));
 
@@ -35,16 +33,16 @@ export const CSVUploader = ({ onComplete }) => {
           .insert(formattedData);
 
         if (error) {
-          console.error(error);
           setStatus('error');
         } else {
           setStatus('success');
           if (onComplete) onComplete();
+          // Reset to idle after 3 seconds so they can upload more
+          setTimeout(() => setStatus('idle'), 3000);
         }
         setUploading(false);
       },
-      error: (err) => {
-        console.error(err);
+      error: () => {
         setStatus('error');
         setUploading(false);
       }
@@ -54,37 +52,35 @@ export const CSVUploader = ({ onComplete }) => {
   return (
     <div className="w-full">
       <label 
-        className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-2xl cursor-pointer transition-all
+        className={`relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300
           ${status === 'success' ? 'border-green-500 bg-green-50' : 
             status === 'error' ? 'border-red-500 bg-red-50' : 
-            'border-gray-300 bg-white hover:border-admin-accent hover:bg-gray-50'}
+            'border-slate-200 bg-white hover:border-deli-gold hover:bg-slate-50'}
         `}
       >
-        <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+        <div className="flex flex-col items-center justify-center text-center px-4">
           {uploading ? (
-            <>
-              <Loader2 className="w-10 h-10 mb-3 text-admin-accent animate-spin" />
-              <p className="text-sm text-gray-500 font-bold uppercase tracking-widest">Processing Spreadsheet...</p>
-            </>
+            <div className="flex flex-col items-center">
+              <Loader2 className="w-8 h-8 mb-2 text-deli-gold animate-spin" />
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Uploading...</p>
+            </div>
           ) : status === 'success' ? (
-            <>
-              <CheckCircle2 className="w-10 h-10 mb-3 text-green-500" />
-              <p className="text-sm text-green-600 font-bold uppercase tracking-widest">Menu Updated Successfully!</p>
-              <p className="text-xs text-green-500 mt-1">Select another file to upload more</p>
-            </>
+            <div className="flex flex-col items-center animate-in zoom-in duration-300">
+              <CheckCircle2 className="w-8 h-8 mb-2 text-green-500" />
+              <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest">Done!</p>
+            </div>
           ) : status === 'error' ? (
-            <>
-              <AlertCircle className="w-10 h-10 mb-3 text-red-500" />
-              <p className="text-sm text-red-600 font-bold uppercase tracking-widest">Upload Failed</p>
-              <p className="text-xs text-red-500 mt-1">Check your column headers and try again</p>
-            </>
+            <div className="flex flex-col items-center animate-in shake duration-300">
+              <AlertCircle className="w-8 h-8 mb-2 text-red-500" />
+              <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest">Error - Check CSV</p>
+            </div>
           ) : (
             <>
-              <Upload className="w-10 h-10 mb-3 text-gray-400 group-hover:text-admin-accent" />
-              <p className="mb-2 text-sm text-gray-700">
-                <span className="font-bold">Click to upload</span> or drag and drop
+              <Upload className="w-6 h-6 mb-2 text-slate-300" />
+              <p className="text-xs text-slate-600 font-medium">
+                <span className="text-deli-mustard font-bold">Bulk Upload</span> CSV
               </p>
-              <p className="text-xs text-gray-400 uppercase tracking-tighter">CSV (Max 10MB)</p>
+              <p className="text-[9px] text-slate-400 uppercase tracking-tighter mt-1">Tap to select</p>
             </>
           )}
         </div>
