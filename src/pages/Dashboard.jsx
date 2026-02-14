@@ -56,7 +56,8 @@ export const Dashboard = ({ onLogout }) => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
+    // FIX: Added fixed position and overflow-hidden to root to lock the viewport
+    <div className="fixed inset-0 flex bg-slate-50 font-sans text-slate-900 overflow-hidden">
       
       {/* MOBILE HEADER - Fixed at top */}
       <div className="lg:hidden fixed top-0 w-full bg-deli-green text-white p-4 flex justify-between items-center z-50 shadow-md">
@@ -117,10 +118,11 @@ export const Dashboard = ({ onLogout }) => {
       )}
 
       {/* 2. MAIN CONTENT AREA */}
-      <main className={`flex-1 min-w-0 h-full overflow-y-auto p-4 sm:p-6 lg:p-12 pt-24 lg:pt-12 transition-all duration-300 ${isSidebarOpen ? 'scale-[0.98] origin-right' : 'scale-100'}`}>
+      {/* FIX: Added overflow-x-hidden and w-full to the main scroll area */}
+      <main className={`flex-1 w-full max-w-full overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-12 pt-24 lg:pt-12 transition-all duration-300 ${isSidebarOpen ? 'scale-[0.98] origin-right' : 'scale-100'}`}>
         
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 lg:mb-12 gap-6">
-          <div>
+          <div className="max-w-full overflow-hidden">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-deli-green italic mb-2">Morning, Mustard!</h1>
             <p className="text-slate-400 text-sm font-light">The website dashboard.</p>
           </div>
@@ -140,7 +142,7 @@ export const Dashboard = ({ onLogout }) => {
           <StatCard title="Catering" count={stats.catering} icon={<Truck className="text-deli-gold" />} color="bg-green-50" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-10">
           
           {/* THE CONTROL TOWER */}
           <div className="order-first lg:order-last">
@@ -170,12 +172,20 @@ export const Dashboard = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* THE MENU TABLE - Fixed container to prevent mobile poo */}
-          <div className="lg:col-span-2 min-w-0 w-full">
-              <MenuTable 
-                key={stats.cafe + stats.deli + stats.catering} 
-                onEdit={handleEdit} 
-              />
+          {/* THE MENU TABLE - Added horizontal scroll containment */}
+          <div className="lg:col-span-2 min-w-0 w-full overflow-hidden">
+             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className="p-6 lg:p-8 border-b border-slate-50 flex items-center justify-between">
+                  <h3 className="font-serif italic text-xl lg:text-2xl text-deli-green">Active Menu</h3>
+                  <span className="px-2 py-1 bg-green-50 text-[9px] font-bold text-green-600 rounded uppercase tracking-widest">Live</span>
+                </div>
+                <div className="overflow-x-auto w-full">
+                  <MenuTable 
+                    key={stats.cafe + stats.deli + stats.catering} 
+                    onEdit={handleEdit} 
+                  />
+                </div>
+             </div>
           </div>
 
         </div>
