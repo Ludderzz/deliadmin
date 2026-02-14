@@ -89,8 +89,6 @@ export const Dashboard = ({ onLogout }) => {
 
         <nav className="space-y-2 flex-1 mt-16 lg:mt-0">
           <NavItem icon={<LayoutDashboard size={20}/>} label="Overview" active onClick={() => setIsSidebarOpen(false)} />
-          <NavItem icon={<Utensils size={20}/>} label="Cafe Menu" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem icon={<ShoppingBag size={20}/>} label="Deli Goods" onClick={() => setIsSidebarOpen(false)} />
           
           <div className="mt-10 pt-10 border-t border-white/10 hidden lg:block">
             <h3 className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-4 px-4">Admin Help</h3>
