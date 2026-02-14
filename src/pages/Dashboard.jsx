@@ -56,7 +56,7 @@ export const Dashboard = ({ onLogout }) => {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900 overflow-x-hidden">
+    <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
       
       {/* MOBILE HEADER - Fixed at top */}
       <div className="lg:hidden fixed top-0 w-full bg-deli-green text-white p-4 flex justify-between items-center z-50 shadow-md">
@@ -76,7 +76,7 @@ export const Dashboard = ({ onLogout }) => {
       <aside className={`
         fixed inset-y-0 left-0 w-72 bg-deli-green text-white p-6 flex flex-col z-50 shadow-2xl transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-        lg:translate-x-0 lg:static lg:h-screen
+        lg:translate-x-0 lg:static lg:h-screen lg:shrink-0
       `}>
         <div className="hidden lg:flex items-center gap-3 mb-10 px-2">
           <div className="w-10 h-10 bg-deli-gold rounded-xl flex items-center justify-center font-serif font-bold text-xl shadow-lg shadow-black/20 text-deli-green">M</div>
@@ -117,7 +117,7 @@ export const Dashboard = ({ onLogout }) => {
       )}
 
       {/* 2. MAIN CONTENT AREA */}
-      <main className={`flex-1 min-w-0 p-4 sm:p-6 lg:p-12 pt-24 lg:pt-12 transition-all duration-300 ${isSidebarOpen ? 'scale-[0.98] origin-right' : 'scale-100'}`}>
+      <main className={`flex-1 min-w-0 h-full overflow-y-auto p-4 sm:p-6 lg:p-12 pt-24 lg:pt-12 transition-all duration-300 ${isSidebarOpen ? 'scale-[0.98] origin-right' : 'scale-100'}`}>
         
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 lg:mb-12 gap-6">
           <div>
@@ -133,7 +133,7 @@ export const Dashboard = ({ onLogout }) => {
           </button>
         </header>
 
-        {/* STATS SECTION - Horizontal scroll on very small screens if needed, otherwise stack */}
+        {/* STATS SECTION */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-8 mb-8 lg:mb-12">
           <StatCard title="Cafe" count={stats.cafe} icon={<Utensils className="text-deli-gold" />} color="bg-orange-50" />
           <StatCard title="Deli" count={stats.deli} icon={<ShoppingBag className="text-deli-gold" />} color="bg-blue-50" />
@@ -142,7 +142,7 @@ export const Dashboard = ({ onLogout }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* THE CONTROL TOWER - Moved to top on mobile for quick access */}
+          {/* THE CONTROL TOWER */}
           <div className="order-first lg:order-last">
             <div className="bg-white rounded-3xl p-6 lg:p-8 shadow-xl border border-deli-gold/20 relative overflow-hidden">
               <h3 className="font-serif italic text-2xl text-deli-green mb-1">Header Message</h3>
@@ -170,14 +170,14 @@ export const Dashboard = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* THE MENU TABLE - Scrollable container */}
+          {/* THE MENU TABLE */}
           <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
              <div className="p-6 lg:p-8 border-b border-slate-50 flex items-center justify-between">
                 <h3 className="font-serif italic text-xl lg:text-2xl text-deli-green">Active Menu</h3>
                 <span className="px-2 py-1 bg-green-50 text-[9px] font-bold text-green-600 rounded uppercase tracking-widest">Live</span>
              </div>
-             <div className="overflow-x-auto">
-               <div className="min-w-[600px] p-4 lg:p-8">
+             <div className="overflow-x-auto w-full">
+               <div className="p-4 lg:p-8">
                  <MenuTable 
                    key={stats.cafe + stats.deli + stats.catering} 
                    onEdit={handleEdit} 
@@ -197,7 +197,6 @@ export const Dashboard = ({ onLogout }) => {
   );
 };
 
-// NavItem Helper - Improved touch area
 const NavItem = ({ icon, label, active = false, onClick }) => (
   <button 
     onClick={onClick}
@@ -208,7 +207,6 @@ const NavItem = ({ icon, label, active = false, onClick }) => (
   </button>
 );
 
-// StatCard Helper - Optimized for small screens
 const StatCard = ({ title, count, icon, color }) => (
   <div className="bg-white p-5 lg:p-8 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
     <div>
