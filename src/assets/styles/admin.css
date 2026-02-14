@@ -101,3 +101,14 @@ html, body {
   overflow-x: hidden;
   position: relative; /* Safety net for absolute elements */
 }
+/* THE POO KILLER */
+* {
+  max-width: 100vw !important;
+  word-wrap: break-word !important;
+  box-sizing: border-box !important;
+}
+
+table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
