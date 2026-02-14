@@ -1,0 +1,21 @@
+﻿@import "tailwindcss";
+
+@theme {
+  /* Brand Colors */
+  --color-deli-green: #465d6a;
+  --color-deli-gold: #c8a011;
+  
+  /* Admin UI Mapping */
+  --color-admin-bg: #f8f9fa;
+  --color-admin-primary: #c8a011;
+  --color-admin-accent: #465d6a;
+}
+
+/* Base styles to ensure centering works */
+@layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    background-color: var(--color-admin-bg);
+  }
+}

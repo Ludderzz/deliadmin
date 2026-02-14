@@ -1,0 +1,98 @@
+﻿@import "tailwindcss";
+
+/* 1. DEFINE THE BRAND THEME */
+@theme {
+  --color-deli-green: #465d6a;
+  --color-deli-gold: #c8a011;
+  --color-deli-cream: #f0ede6;
+  
+  /* UI Colors */
+  --color-admin-primary: #c8a011;
+  --color-admin-accent: #465d6a;
+  --color-admin-bg: #f8f9fa;
+  
+  /* Typography */
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+/* 2. BASE STYLES */
+@layer base {
+  body {
+    @apply bg-admin-bg text-slate-900 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
+  }
+}
+
+/* 3. REUSABLE COMPONENTS */
+@layer components {
+  /* The Dashboard Containers */
+  .admin-card {
+    @apply bg-white rounded-2xl border border-slate-200 shadow-sm p-6 transition-all duration-300 hover:shadow-md hover:border-admin-accent/20;
+  }
+
+  /* Sidebar Navigation Links */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 transition-all duration-200 font-medium text-sm;
+  }
+
+  .sidebar-link:hover {
+    @apply bg-white/5 text-white;
+  }
+
+  .sidebar-link-active {
+    @apply bg-white/10 text-admin-accent shadow-inner border-l-4 border-admin-accent;
+  }
+
+  /* Premium Buttons */
+  .btn-primary {
+    @apply bg-admin-primary text-white px-6 py-2.5 rounded-xl font-bold text-[10px] tracking-[0.2em] uppercase 
+           transition-all shadow-lg shadow-admin-primary/20 active:scale-95 cursor-pointer;
+  }
+
+  .btn-primary:hover {
+    @apply bg-admin-primary/90 -translate-y-0.5 shadow-xl shadow-admin-primary/30;
+  }
+
+  .btn-outline {
+    @apply border border-slate-200 text-slate-600 px-6 py-2.5 rounded-xl font-bold text-[10px] tracking-[0.2em] uppercase 
+           transition-all hover:bg-slate-50 hover:border-slate-300 active:scale-95 cursor-pointer;
+  }
+
+  /* Form Inputs */
+  .admin-input {
+    @apply w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm 
+           transition-all focus:outline-none focus:ring-4 focus:ring-admin-accent/10 focus:border-admin-accent;
+  }
+
+  /* Status Badges */
+  .badge-live {
+    @apply flex items-center gap-1.5 px-2 py-1 rounded bg-green-50 text-green-700 text-[9px] font-bold uppercase tracking-wider;
+  }
+
+  .badge-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse;
+  }
+}
+
+/* 4. CUSTOM UTILITIES & ANIMATIONS */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Custom scrollbar for a cleaner look */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300;
+  }
+}
