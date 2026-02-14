@@ -108,23 +108,30 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex justify-end">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-deli-green/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+    // FIX: Changed to h-[100dvh] to handle mobile browser bars and added overflow-hidden
+    <div className="fixed inset-0 z-[200] flex justify-end overflow-hidden">
       
-      {/* Drawer Container */}
-      <div className="relative w-full md:max-w-lg bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+      {/* Backdrop - Added touch-none to prevent background scrolling */}
+      <div 
+        className="absolute inset-0 bg-deli-green/40 backdrop-blur-sm transition-opacity touch-none" 
+        onClick={onClose} 
+      />
+      
+      {/* Drawer Container - Fixed widths for mobile vs desktop */}
+      <div className="relative w-screen max-w-full md:max-w-lg bg-white h-[100dvh] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-slate-100">
+        <div className="flex justify-between items-center p-6 border-b border-slate-100 shrink-0">
           <h2 className="text-2xl md:text-3xl font-serif text-deli-green italic">
             {initialData ? 'Edit Product' : (isCatering ? 'Add Catering' : 'Add New Item')}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X size={24} /></button>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+            <X size={24} />
+          </button>
         </div>
         
-        {/* Scrollable Form Area */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 pb-32">
+        {/* Scrollable Form Area - Added better padding-bottom for mobile clearance */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 pb-40">
           
           {/* IMAGE UPLOAD */}
           <div>
@@ -155,7 +162,7 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
               <input 
                 required 
                 type="text" 
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base md:text-sm focus:border-deli-gold outline-none transition-all" 
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none transition-all" 
                 placeholder={isCatering ? "e.g. Luxury Sandwich Platter" : "e.g. Somerset Brie Sourdough"} 
                 value={formData.name} 
                 onChange={e => setFormData({...formData, name: e.target.value})} 
@@ -178,15 +185,17 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
               </div>
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">Section</label>
-                <select 
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none appearance-none" 
-                  value={formData.section} 
-                  onChange={e => setFormData({...formData, section: e.target.value})}
-                >
-                  <option value="cafe">Cafe</option>
-                  <option value="deli">Deli Retail</option>
-                  <option value="catering">Catering</option>
-                </select>
+                <div className="relative">
+                  <select 
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none appearance-none" 
+                    value={formData.section} 
+                    onChange={e => setFormData({...formData, section: e.target.value})}
+                  >
+                    <option value="cafe">Cafe</option>
+                    <option value="deli">Deli Retail</option>
+                    <option value="catering">Catering</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -199,7 +208,7 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
                   <div className={`p-2 rounded-lg ${isDeal ? 'bg-deli-gold text-white' : 'bg-slate-200 text-slate-400'}`}>
                     <Percent size={16} />
                   </div>
-                  <span className="text-sm font-bold text-deli-green uppercase tracking-wider">Set as Daily Deal?</span>
+                  <span className="text-sm font-bold text-deli-green uppercase tracking-wider">Daily Deal?</span>
                 </div>
                 <input 
                   type="checkbox" 
@@ -225,30 +234,26 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
                </div>
                <div>
                   <p className="text-xs font-bold text-deli-green uppercase tracking-tight leading-none mb-1">Catering Mode</p>
-                  <p className="text-[10px] text-slate-500 italic">Mention minimum order counts in description.</p>
+                  <p className="text-[10px] text-slate-500 italic">Mention minimum order counts below.</p>
                </div>
             </div>
           )}
 
           <div className="space-y-5">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">
-                {isCatering ? 'Package Overview' : 'Description'}
-              </label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">Description</label>
               <textarea 
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none h-24" 
-                placeholder={isCatering ? "What's included in this platter?" : "Describe the flavours..."} 
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none h-24 resize-none" 
+                placeholder="Describe the flavours..." 
                 value={formData.description} 
                 onChange={e => setFormData({...formData, description: e.target.value})} 
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">
-                {isCatering ? 'Item List' : 'Ingredients'}
-              </label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block mb-2">Ingredients</label>
               <textarea 
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none h-20" 
-                placeholder={isCatering ? "List specific items..." : "Flour, water, salt..."} 
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-base focus:border-deli-gold outline-none h-20 resize-none" 
+                placeholder="Flour, water, salt..." 
                 value={formData.ingredients} 
                 onChange={e => setFormData({...formData, ingredients: e.target.value})} 
               />
@@ -265,7 +270,7 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
                   onClick={() => handleTagToggle(tag)}
                   className={`px-5 py-2 rounded-full text-[10px] font-black border transition-all active:scale-90 ${
                     formData.tags.includes(tag) 
-                    ? 'bg-deli-green text-white border-deli-green shadow-md shadow-deli-green/20' 
+                    ? 'bg-deli-green text-white border-deli-green' 
                     : 'bg-white text-slate-400 border-slate-200'
                   }`}
                 >
@@ -276,15 +281,15 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
           </div>
         </form>
 
-        {/* Fixed Footer Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-slate-100 backdrop-blur-md">
+        {/* Fixed Footer */}
+        <div className="p-6 bg-white border-t border-slate-100 shrink-0">
           <button 
             disabled={loading} 
             onClick={handleSubmit}
-            className="w-full bg-deli-green text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:shadow-xl active:scale-95 transition-all disabled:opacity-50"
+            className="w-full bg-deli-green text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
           >
             {loading ? 'Saving...' : (
-              <>{initialData ? <Save size={18}/> : <Plus size={18}/>} {initialData ? 'Update Live Menu' : 'Add to Live Menu'}</>
+              <>{initialData ? <Save size={18}/> : <Plus size={18}/>} {initialData ? 'Update Menu' : 'Add to Menu'}</>
             )}
           </button>
         </div>
