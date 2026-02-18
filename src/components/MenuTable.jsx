@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Trash2, Edit3, Tag, Star, MapPin, Search } from 'lucide-react';
+import { Trash2, Edit3, Tag, Star, MapPin, Search, Layers } from 'lucide-react';
 
 export const MenuTable = ({ onEdit }) => {
   const [items, setItems] = useState([]);
@@ -15,7 +15,9 @@ export const MenuTable = ({ onEdit }) => {
     const { data, error } = await supabase
       .from('menu_items')
       .select('*')
-      .order('created_at', { ascending: false });
+      // Sorting by section and category makes the table much easier to read
+      .order('section', { ascending: true })
+      .order('category', { ascending: true });
 
     if (!error) setItems(data);
     setLoading(false);
@@ -28,9 +30,11 @@ export const MenuTable = ({ onEdit }) => {
     }
   };
 
+  // Improved search to include category filtering
   const filteredItems = items.filter(item => 
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.section.toLowerCase().includes(searchTerm.toLowerCase())
+    item.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.category && item.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   if (loading) return <div className="p-8 text-center font-serif italic text-gray-400">Loading live menu...</div>;
@@ -43,7 +47,7 @@ export const MenuTable = ({ onEdit }) => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
           <input 
             type="text" 
-            placeholder="Search inventory..."
+            placeholder="Search name, section, or category..."
             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-deli-mustard transition-colors"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -61,10 +65,16 @@ export const MenuTable = ({ onEdit }) => {
             <div key={item.id} className="p-5 flex flex-col gap-3">
               <div className="flex justify-between items-start">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="text-[9px] font-bold uppercase px-2 py-0.5 bg-slate-100 text-slate-500 rounded">
                       {item.section}
                     </span>
+                    {/* Category Tag for Mobile */}
+                    {item.category && (
+                      <span className="text-[9px] font-bold uppercase px-2 py-0.5 bg-deli-mustard/10 text-deli-mustard rounded">
+                        {item.category}
+                      </span>
+                    )}
                     {item.is_deal && <Star size={10} className="text-deli-mustard fill-deli-mustard" />}
                   </div>
                   <h4 className="font-bold text-slate-800 truncate">{item.name}</h4>
@@ -81,12 +91,12 @@ export const MenuTable = ({ onEdit }) => {
         </div>
 
         {/* DESKTOP VIEW */}
-        <div className="hidden md:block">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="text-[10px] uppercase tracking-widest text-slate-400 border-b border-slate-50 bg-slate-50/30">
                 <th className="px-8 py-5 font-bold">Listing Details</th>
-                <th className="px-8 py-5 font-bold">Section</th>
+                <th className="px-8 py-5 font-bold">Classification</th>
                 <th className="px-8 py-5 font-bold">Price</th>
                 <th className="px-8 py-5 font-bold text-right">Management</th>
               </tr>
@@ -108,9 +118,16 @@ export const MenuTable = ({ onEdit }) => {
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-400 bg-slate-100 px-2 py-1 rounded">
-                      {item.section}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                        {item.section}
+                      </span>
+                      {item.category && (
+                        <div className="flex items-center gap-1 text-deli-mustard font-bold text-[10px] uppercase tracking-tighter">
+                          <Layers size={10} /> {item.category}
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-8 py-5 font-serif text-deli-blue font-bold">
                     {item.is_deal ? (
