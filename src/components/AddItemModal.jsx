@@ -16,7 +16,7 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
     section: 'cafe',
     category: 'Breakfast',
     sort_order: '999',
-    number_items: '1', // This is our Priority Number
+    number_items: '999', // This is our Priority Number
     tags: [],
     image_url: '',
   });
