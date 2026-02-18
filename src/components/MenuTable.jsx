@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Trash2, Edit3, Tag, Star, ImageIcon, MoreVertical } from 'lucide-react';
+import { Trash2, Edit3, Tag, Star, MapPin, Search } from 'lucide-react';
 
 export const MenuTable = ({ onEdit }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchItems();
@@ -27,131 +28,121 @@ export const MenuTable = ({ onEdit }) => {
     }
   };
 
+  const filteredItems = items.filter(item => 
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.section.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) return <div className="p-8 text-center font-serif italic text-gray-400">Loading live menu...</div>;
 
   return (
-    // FIX: Added 'max-w-full' and 'relative' to ensure the container never grows
-    <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm w-full max-w-full relative">
-      {/* Header */}
-      <div className="p-5 md:p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-        <h3 className="font-serif italic text-xl text-deli-green">Live Inventory</h3>
-        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 bg-white px-3 py-1 rounded-full border border-slate-100">
-          {items.length} Items
+    <div className="w-full max-w-full relative">
+      {/* Search & Stats Bar */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6 items-center justify-between">
+        <div className="relative w-full md:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+          <input 
+            type="text" 
+            placeholder="Search inventory..."
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-deli-mustard transition-colors"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 bg-slate-100 px-4 py-2 rounded-full">
+          {filteredItems.length} Products Found
         </span>
       </div>
 
-      {/* 1. MOBILE VIEW: CARD LIST */}
-      <div className="block md:hidden divide-y divide-slate-50 overflow-hidden w-full">
-        {items.map((item) => (
-          // FIX: Changed gap and ensured w-full + overflow-hidden
-          <div key={item.id} className="p-4 flex items-center justify-between gap-2 active:bg-slate-50 transition-colors w-full overflow-hidden">
-            
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="w-12 h-12 rounded-xl bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-100">
-                {item.image_url ? (
-                  <img src={item.image_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center"><ImageIcon size={16} className="text-slate-300" /></div>
-                )}
-              </div>
-              
-              {/* FIX: Nested min-w-0 is required for 'truncate' to work inside flexbox */}
-              <div className="min-w-0 flex-1">
-                <p className="font-bold text-slate-800 text-sm truncate flex items-center gap-1">
-                  {item.name}
-                  {item.is_deal && <Star size={10} className="text-deli-gold fill-deli-gold shrink-0" />}
-                </p>
-                <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-                  <span className="text-[9px] font-black uppercase text-deli-green whitespace-nowrap shrink-0">{item.price}</span>
-                  <span className="text-[8px] text-slate-400 shrink-0">•</span>
-                  <span className="text-[9px] uppercase font-bold text-slate-400 truncate break-all">{item.section}</span>
+      <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm">
+        {/* MOBILE VIEW */}
+        <div className="block md:hidden divide-y divide-slate-50">
+          {filteredItems.map((item) => (
+            <div key={item.id} className="p-5 flex flex-col gap-3">
+              <div className="flex justify-between items-start">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[9px] font-bold uppercase px-2 py-0.5 bg-slate-100 text-slate-500 rounded">
+                      {item.section}
+                    </span>
+                    {item.is_deal && <Star size={10} className="text-deli-mustard fill-deli-mustard" />}
+                  </div>
+                  <h4 className="font-bold text-slate-800 truncate">{item.name}</h4>
+                  <p className="text-xs text-deli-green font-bold mt-1">{item.price}</p>
+                </div>
+                
+                <div className="flex gap-1">
+                  <button onClick={() => onEdit(item)} className="p-2 text-slate-400 bg-slate-50 rounded-lg"><Edit3 size={16}/></button>
+                  <button onClick={() => deleteItem(item.id)} className="p-2 text-red-300 bg-red-50 rounded-lg"><Trash2 size={16}/></button>
                 </div>
               </div>
             </div>
-            
-            <div className="flex gap-0 shrink-0">
-              <button onClick={() => onEdit(item)} className="p-2 text-slate-400 active:text-deli-green rounded-xl transition-all">
-                <Edit3 size={18} />
-              </button>
-              <button onClick={() => deleteItem(item.id)} className="p-2 text-slate-400 active:text-red-500 rounded-xl transition-all">
-                <Trash2 size={18} />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* 2. DESKTOP VIEW: TABLE */}
-      {/* FIX: Added 'table-fixed' to the table to prevent column expansion */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-left border-collapse table-fixed">
-          <thead>
-            <tr className="text-[10px] uppercase tracking-widest text-slate-400 border-b border-slate-50">
-              <th className="px-6 py-4 font-bold w-1/2">Item Details</th>
-              <th className="px-6 py-4 font-bold">Section</th>
-              <th className="px-6 py-4 font-bold">Price</th>
-              <th className="px-6 py-4 font-bold text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {items.map((item) => (
-              <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200 flex items-center justify-center">
-                      {item.image_url ? (
-                        <img src={item.image_url} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center"><ImageIcon size={14} className="text-slate-300" /></div>
+        {/* DESKTOP VIEW */}
+        <div className="hidden md:block">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="text-[10px] uppercase tracking-widest text-slate-400 border-b border-slate-50 bg-slate-50/30">
+                <th className="px-8 py-5 font-bold">Listing Details</th>
+                <th className="px-8 py-5 font-bold">Section</th>
+                <th className="px-8 py-5 font-bold">Price</th>
+                <th className="px-8 py-5 font-bold text-right">Management</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {filteredItems.map((item) => (
+                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <td className="px-8 py-5">
+                    <div className="flex flex-col min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-deli-blue">{item.name}</span>
+                        {item.is_deal && <Star size={12} className="text-deli-mustard fill-deli-mustard" />}
+                      </div>
+                      {item.ingredients && (
+                        <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-400 italic">
+                          <MapPin size={10} /> {item.ingredients}
+                        </div>
                       )}
                     </div>
-                    <div className="flex flex-col min-w-0 overflow-hidden">
-                      <span className="font-bold text-slate-700 flex items-center gap-2 truncate">
-                        {item.name}
-                        {item.is_deal && (
-                          <span className="bg-deli-gold/10 text-deli-gold p-1 rounded-md shrink-0" title="Daily Deal">
-                            <Star size={10} fill="currentColor" />
-                          </span>
-                        )}
-                      </span>
-                      <span className="text-xs text-slate-400 line-clamp-1 italic font-light truncate">
-                        {item.description || 'No description provided.'}
-                      </span>
+                  </td>
+                  <td className="px-8 py-5">
+                    <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-400 bg-slate-100 px-2 py-1 rounded">
+                      {item.section}
+                    </span>
+                  </td>
+                  <td className="px-8 py-5 font-serif text-deli-blue font-bold">
+                    {item.is_deal ? (
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-deli-mustard">{item.deal_price}</span>
+                        <span className="text-[9px] text-slate-300 line-through">{item.price}</span>
+                      </div>
+                    ) : item.price}
+                  </td>
+                  <td className="px-8 py-5 text-right">
+                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => onEdit(item)} className="text-slate-400 hover:text-deli-blue transition-colors flex items-center gap-1 text-xs font-bold uppercase">
+                        <Edit3 size={14} /> Edit
+                      </button>
+                      <button onClick={() => deleteItem(item.id)} className="text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1 text-xs font-bold uppercase">
+                        <Trash2 size={14} /> Remove
+                      </button>
                     </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`text-[9px] font-bold uppercase px-2 py-1 rounded-md tracking-wider ${
-                    item.section === 'cafe' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
-                  }`}>
-                    {item.section}
-                  </span>
-                </td>
-                <td className="px-6 py-4 font-serif text-deli-green font-bold whitespace-nowrap">
-                  {item.price}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => onEdit(item)} className="p-2 text-slate-400 hover:text-deli-green transition-colors">
-                      <Edit3 size={16} />
-                    </button>
-                    <button onClick={() => deleteItem(item.id)} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {items.length === 0 && (
-        <div className="p-20 text-center">
-          <Tag className="mx-auto text-slate-200 mb-4" size={48} />
-          <p className="text-slate-400 font-serif italic text-lg">No items found.</p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
+
+        {filteredItems.length === 0 && (
+          <div className="p-20 text-center">
+            <Tag className="mx-auto text-slate-100 mb-4" size={48} />
+            <p className="text-slate-400 font-serif italic">No provisions found matching your search.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
