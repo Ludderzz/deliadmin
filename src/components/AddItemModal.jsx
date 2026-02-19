@@ -193,8 +193,17 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
             </div>
 
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#465d6a] block mb-2">Description / Menu Details</label>
-              <textarea className="w-full bg-white border-2 border-[#465d6a]/20 rounded-xl p-4 text-base focus:border-[#c8a011] outline-none h-32 md:h-40 resize-none italic leading-relaxed" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+              <label className="text-[10px] font-black uppercase tracking-widest text-[#465d6a] block mb-2 flex justify-between">
+                <span>Description / Menu Details</span>
+                {isCatering && formData.category === 'Set Menus' && <span className="text-[#c8a011] lowercase font-bold">Enter for new lines</span>}
+              </label>
+              {/* Increased height to h-64 (~8-10 lines) and removed italic class */}
+              <textarea 
+                className="w-full bg-white border-2 border-[#465d6a]/20 rounded-xl p-4 text-base focus:border-[#c8a011] outline-none h-64 resize-y not-italic leading-relaxed" 
+                placeholder={isCatering && formData.category === 'Set Menus' ? "Item One\nItem Two\nItem Three..." : "Describe the item..."}
+                value={formData.description} 
+                onChange={e => setFormData({...formData, description: e.target.value})} 
+              />
             </div>
           </div>
 
