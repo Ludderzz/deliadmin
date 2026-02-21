@@ -26,6 +26,7 @@ export const DeliAdmin = () => {
   };
 
   const handleImageUpload = async (e) => {
+    // Safety check: Don't allow more than 6
     if (images.length >= 6) {
       alert("Maximum 6 images allowed.");
       return;
@@ -39,19 +40,33 @@ export const DeliAdmin = () => {
     const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `bottom-gallery/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('deli-gallery')
-      .upload(filePath, file);
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('deli-gallery')
+        .upload(filePath, file);
 
-    if (!uploadError) {
+      if (uploadError) throw uploadError;
+
       const { data } = supabase.storage.from('deli-gallery').getPublicUrl(filePath);
-      setImages([...images, data.publicUrl]);
+      
+      // Use functional update to ensure we always have the latest array
+      setImages(prev => {
+        if (prev.length >= 6) return prev;
+        return [...prev, data.publicUrl];
+      });
+
+    } catch (error) {
+      console.error("Upload error:", error.message);
+      alert("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+      // Reset input value so same file can be uploaded if deleted
+      e.target.value = '';
     }
-    setUploading(false);
   };
 
   const removeImage = (url) => {
-    setImages(images.filter(img => img !== url));
+    setImages(prev => prev.filter(img => img !== url));
   };
 
   const saveAll = async () => {
@@ -66,8 +81,8 @@ export const DeliAdmin = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white rounded-3xl shadow-sm border border-slate-100 mt-10">
-      <h2 className="text-3xl font-serif text-deli-blue mb-8">Edit Deli Bottom Section</h2>
+    <div className="max-w-4xl mx-auto p-4 md:p-8 bg-white rounded-3xl shadow-sm border border-slate-100 mt-10">
+      <h2 className="text-2xl md:text-3xl font-serif text-deli-blue mb-8">Edit Deli Bottom Section</h2>
 
       {/* TEXT CONTENT */}
       <div className="mb-8">
@@ -76,34 +91,51 @@ export const DeliAdmin = () => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-deli-mustard h-32"
-          placeholder="Add seasonal info, opening times, or special notes..."
+          placeholder="Add seasonal info..."
         />
       </div>
 
-      {/* IMAGE UPLOAD */}
+      {/* IMAGE UPLOAD - REBUILT FOR MOBILE STABILITY */}
       <div className="mb-8">
-        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">
           Gallery Images ({images.length}/6)
         </label>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+        {/* Using flex-wrap and percentage widths to guarantee the 6th image has space */}
+        <div className="flex flex-wrap gap-2 md:gap-4 mb-4">
           {images.map((url, i) => (
-            <div key={i} className="relative aspect-square rounded-2xl overflow-hidden border border-slate-100 group">
+            <div 
+              key={`${url}-${i}`} 
+              className="relative w-[30%] md:w-[15%] aspect-square rounded-xl overflow-hidden border border-slate-100 bg-slate-50"
+            >
               <img src={url} alt="Preview" className="w-full h-full object-cover" />
               <button 
                 onClick={() => removeImage(url)}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full z-10 shadow-md"
+                type="button"
               >
-                <X size={14} />
+                <X size={12} strokeWidth={3} />
               </button>
             </div>
           ))}
           
           {images.length < 6 && (
-            <label className="flex flex-col items-center justify-center aspect-square rounded-2xl border-2 border-dashed border-slate-200 hover:border-deli-mustard transition-colors cursor-pointer bg-slate-50">
-              {uploading ? <Loader2 className="animate-spin text-deli-mustard" /> : <Upload className="text-slate-400" />}
-              <span className="text-[10px] mt-2 font-bold uppercase text-slate-400">Upload Photo</span>
-              <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" disabled={uploading} />
+            <label className="flex flex-col items-center justify-center w-[30%] md:w-[15%] aspect-square rounded-xl border-2 border-dashed border-slate-200 hover:border-deli-mustard transition-colors cursor-pointer bg-slate-50 active:bg-slate-100">
+              {uploading ? (
+                <Loader2 className="animate-spin text-deli-mustard" />
+              ) : (
+                <>
+                  <Upload className="text-slate-400" size={20} />
+                  <span className="text-[8px] mt-1 font-bold uppercase text-slate-400">Add</span>
+                </>
+              )}
+              <input 
+                type="file" 
+                className="hidden" 
+                onChange={handleImageUpload} 
+                accept="image/*" 
+                disabled={uploading} 
+              />
             </label>
           )}
         </div>
@@ -112,10 +144,10 @@ export const DeliAdmin = () => {
       <button 
         onClick={saveAll}
         disabled={saving}
-        className="w-full bg-deli-blue text-white py-4 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-deli-mustard transition-all shadow-xl"
+        className="w-full bg-deli-blue text-white py-4 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-deli-mustard transition-all shadow-xl active:scale-[0.98]"
       >
         {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-        Publish Changes to Deli Page
+        Publish Changes
       </button>
     </div>
   );
