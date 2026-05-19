@@ -21,12 +21,11 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
     image_url: '',
   });
 
-  // Helper variables for logic
   const isCatering = formData.section === 'catering';
-  const isCafe = formData.section === 'cafe';
-
+  
+  // Added "Cakes & Sweet Treats" directly to the presets here
   const cafeCategories = ['Breakfast', 'Lunch', 'Takeaway', 'Children\'s Menu', 'Hot Drinks', 'Cold Drinks'];
-  const cateringCategories = ['Set Menus', 'Party Platters', 'Canapés'];
+  const cateringCategories = ['Set Menus', 'Party Platters', 'Canapés', 'Cakes & Sweet Treats'];
 
   useEffect(() => {
     if (initialData && isOpen) {
@@ -168,10 +167,11 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
               <input type="number" inputMode="numeric" className="w-full bg-transparent text-[#465d6a] font-bold outline-none" value={formData.number_items} onChange={e => setFormData({...formData, number_items: e.target.value})} />
             </div>
 
-            {isCatering && formData.category === 'Party Platters' && (
+            {/* If it's a Platter or Cake, show the Serving Size box */}
+            {isCatering && (formData.category === 'Party Platters' || formData.category === 'Cakes & Sweet Treats') && (
               <div className="p-4 bg-[#c8a011]/5 rounded-2xl border-2 border-[#c8a011]/20 shadow-sm">
-                <label className="text-[10px] font-black uppercase tracking-widest text-[#c8a011] block mb-2">Platter Portions (e.g. "10-12")</label>
-                <input type="text" className="w-full bg-transparent text-[#465d6a] font-bold outline-none" placeholder="How many does it serve?" value={formData.tags} onChange={e => setFormData({...formData, tags: e.target.value})} />
+                <label className="text-[10px] font-black uppercase tracking-widest text-[#c8a011] block mb-2">Serves (e.g. "10-12")</label>
+                <input type="text" className="w-full bg-transparent text-[#465d6a] font-bold outline-none" placeholder="How many people?" value={formData.tags} onChange={e => setFormData({...formData, tags: e.target.value})} />
               </div>
             )}
           </div>
@@ -184,7 +184,7 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
 
             <div>
               <label className="text-[10px] font-black uppercase tracking-widest text-[#465d6a] block mb-2">
-                {isCatering && formData.category !== 'Party Platters' ? 'Price Per Head' : 'Price'}
+                {formData.category === 'Cakes & Sweet Treats' ? 'Price per cake/batch' : (isCatering && formData.category !== 'Party Platters' ? 'Price Per Head' : 'Price')}
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#465d6a] font-bold">£</span>
@@ -193,14 +193,10 @@ export const AddItemModal = ({ isOpen, onClose, onRefresh, initialData }) => {
             </div>
 
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#465d6a] block mb-2 flex justify-between">
-                <span>Description / Menu Details</span>
-                {isCatering && formData.category === 'Set Menus' && <span className="text-[#c8a011] lowercase font-bold">Enter for new lines</span>}
-              </label>
-              {/* Increased height to h-64 (~8-10 lines) and removed italic class */}
+              <label className="text-[10px] font-black uppercase tracking-widest text-[#465d6a] block mb-2">Menu Details / Description</label>
               <textarea 
-                className="w-full bg-white border-2 border-[#465d6a]/20 rounded-xl p-4 text-base focus:border-[#c8a011] outline-none h-64 resize-y not-italic leading-relaxed" 
-                placeholder={isCatering && formData.category === 'Set Menus' ? "Item One\nItem Two\nItem Three..." : "Describe the item..."}
+                className="w-full bg-white border-2 border-[#465d6a]/20 rounded-xl p-4 text-base focus:border-[#c8a011] outline-none h-48 resize-y leading-relaxed" 
+                placeholder="Enter item details here..."
                 value={formData.description} 
                 onChange={e => setFormData({...formData, description: e.target.value})} 
               />
